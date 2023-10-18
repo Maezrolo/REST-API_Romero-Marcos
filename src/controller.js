@@ -20,8 +20,6 @@ class LibrosController{
                 console.log(e);
         }
     }
-
-
 }
 
 export const libro = new LibrosController();
