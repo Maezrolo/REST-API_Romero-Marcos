@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { personas } from './controller.js';
+import { libros } from './controller.js';
 
 export const router = Router()
 
-router.get('/personas', personas.getAll);
-router.post('/personas', personas.add);
+router.get('/libro', libros.getAll);
+router.post('/libro', libros.add);
