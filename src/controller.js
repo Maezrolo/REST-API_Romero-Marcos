@@ -20,6 +20,13 @@ class LibrosController{
                 console.log(e);
         }
     }
+
+    async add (req, res){
+        const libros=req.body;
+        const [result] = await pool.query(`INSERT INTO libros ( Nombre, Autor, Categoria ,año,ISBN) VALUES (?, ?, ?,?,?)`,
+        [libros.Nombre, libros.Autor,libros.Categoria, libros.año, libros.ISBN]);
+        res.json({"Id insertado": result.insertId});
+    }
 }
 
 export const libro = new LibrosController();
