@@ -36,15 +36,14 @@ class LibrosController{
                 [libros.Nombre, libros.Autor, libros.Categoria, libros.año, libros.ISBN]
             );
     
-            res.json({"Libros Cargado": result.changedRows});
+            return res.status(200).json({ Libro: 'Libro ingresado con éxito', IDLibro: result.insertId });
         } catch (error) {
             console.error(error);
             return res.status(500).json({ error: 'Error al ingresar el libro' });
         }
     }
-    
-    
-    
+
+    //actualizar un libro
     async update(req, res){
         try {
             const libro = req.body;
@@ -52,12 +51,13 @@ class LibrosController{
             if (result.changedRows === 0) {
                 throw new Error('No se encontró un libro con el ID proporcionado o los datos proporcionados ya existen.');
             }
-            res.json({"Registros Actualizados": result.changedRows});
+            res.status(200).json({"Registros Actualizados": result.changedRows});
         } catch (error) {
             console.error(error);
             res.status(500).json({ error: 'Hubo un error al actualizar el libro, compruebe los campos requeridos.' });
         }
 }
+    //eliminar un liber por isbn
     
 }
 
