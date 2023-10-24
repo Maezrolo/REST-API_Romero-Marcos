@@ -11,12 +11,12 @@ class LibrosController{
     async getOne(req, res) {
         try{
                 const libro = req.body;
-                const id_libro = parseInt(libro.id_libros);
+                const id_libro = parseInt(libro.id);
                 const [result] = await pool.query(`select * from libros where id_libros=?`, [id_libro]);
                 if (result[0]!=undefined){
                     res.json(result);
                 }else{
-                    res.json({"Error": "No se ha encontrado un libro con la Id especificada"});
+                    res.status(500).json({"Error": "No se ha encontrado un libro con la Id especificada"});
                 }
             }catch(e) {
                 console.log(e);
@@ -24,43 +24,40 @@ class LibrosController{
     }
 
     //agregar un libro
-    async add (req, res){
-        const libros=req.body;
-        const [result] = await pool.query(`INSERT INTO libros ( Nombre, Autor, Categoria ,año,ISBN) VALUES (?, ?, ?,?,?)`,
-        [libros.Nombre, libros.Autor,libros.Categoria, libros.año, libros.ISBN]);
-        res.json({"Id insertado": result.insertId});
-    }
+    async add(req, res) {
+        try {
+            const libros = req.body;
+            if (!libros.Nombre || !libros.Autor || !libros.Categoria || !libros.año || !libros.ISBN) {
+                return res.status(400).json({ error: 'Todos los campos deben completarse' });
+            }
     
-    async update(req, res) {
-        try{
-                const libro = req.body;
-                const id_libro = parseInt(libro.ISBN);
-                const [result] = await pool.query(`select * from libros where ISBN=?`, [id_libro]);
-                if (result.length === 1) {
-                    const updateResult = await pool.query(`UPDATE libros SET Nombre = ?, Autor = ?, Categoria = ?, año = ?, ISBN = ? WHERE id_libro = ?`,
-                    [
-                        libro.Nombre,
-                        libro.Autor,
-                        libro.Categoria,
-                        libro.año,
-                        libro.ISBN,
-                        id_libro
-                    ]
-                );
-                if (updateResult.affectedRows === 1) {
-                    // El libro se actualizó con éxito.
-                    res.json({ message: 'Libro actualizado con éxito' });
-                } else {
-                    // No se pudo actualizar el libro.
-                    res.status(500).json({ error: 'Error al actualizar el libro' });
-                }
-                }else{
-                    res.json({"Error": "No se ha encontrado un libro con la Id especificada"});
-                }
-            }catch(e) {
-                console.log(e);
+            const [result] = await pool.query(
+                `INSERT INTO libros (Nombre, Autor, Categoria, año, ISBN) VALUES (?, ?, ?, ?, ?)`,
+                [libros.Nombre, libros.Autor, libros.Categoria, libros.año, libros.ISBN]
+            );
+    
+            res.json({"Libros Cargado": result.changedRows});
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ error: 'Error al ingresar el libro' });
         }
     }
+    
+    
+    
+    async update(req, res){
+        try {
+            const libro = req.body;
+            const [result] = await pool.query(`UPDATE libros SET Nombre=(?), Autor=(?), Categoria=(?), año=(?), ISBN=(?) WHERE id_libros=(?)`,[libro.Nombre, libro.Autor, libro.Categoria, libro.año, libro.ISBN, libro.id]);
+            if (result.changedRows === 0) {
+                throw new Error('No se encontró un libro con el ID proporcionado o los datos proporcionados ya existen.');
+            }
+            res.json({"Registros Actualizados": result.changedRows});
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'Hubo un error al actualizar el libro, compruebe los campos requeridos.' });
+        }
+}
     
 }
 
