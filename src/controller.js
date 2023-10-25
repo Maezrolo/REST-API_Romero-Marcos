@@ -58,6 +58,24 @@ class LibrosController{
         }
 }
     //eliminar un liber por isbn
+    async delete(req, res) {
+        try {
+            const libro= req.body;
+            const [result] = await pool.query(
+                `DELETE FROM libros WHERE ISBN = (?)`,
+                [libro.ISBN]
+            );
+    
+            if (result.affectedRows === 1) {
+                return res.status(200).json({ Mensaje: 'Libro eliminado con éxito' });
+            } else {
+                return res.status(404).json({ Error: 'No se encontró un libro con el ISBN especificado' });
+            }
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ Error: 'Error al eliminar el libro' });
+        }
+    }
     
 }
 
